@@ -52,6 +52,9 @@ class StreamingCore : Service(), AudioManager.OnAudioFocusChangeListener {
     private var mediaSession: MediaSession? = null
     private var playerNotificationManager: PlayerNotificationManager? = null
 
+    private var notificationTitle = ""
+    private var notificationSubTitle = ""
+    
     // session keys
     private val playbackNotificationId = 1025
     private val mediaSessionId = "streaming_audio_player_media_session"
@@ -88,6 +91,13 @@ class StreamingCore : Service(), AudioManager.OnAudioFocusChangeListener {
         player?.stop()
         stopSelf()
         isBound = false
+    }
+
+    fun setTitle(title: String, subTitle: String) {
+        logger.info("settingTitle $title,  $subTitle ...")
+        notificationTitle = title
+        notificationSubTitle = subTitle
+        playerNotificationManager?.invalidate();
     }
 
     fun setVolume(volume: Double) {
@@ -163,7 +173,7 @@ class StreamingCore : Service(), AudioManager.OnAudioFocusChangeListener {
             localBroadcastManager.sendBroadcast(broadcastMetaDataIntent.putExtra("meta_data", metaData))
         }
 
-        val playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
+        playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
                 context,
                 playbackChannelId,
                 R.string.channel_name,
@@ -171,7 +181,8 @@ class StreamingCore : Service(), AudioManager.OnAudioFocusChangeListener {
                 playbackNotificationId,
                 object : PlayerNotificationManager.MediaDescriptionAdapter {
                     override fun getCurrentContentTitle(player: Player): String {
-                        return appName
+                        logger.info("Changing title $notificationTitle...")
+                        return notificationTitle;
                     }
 
                     @Nullable
@@ -181,7 +192,9 @@ class StreamingCore : Service(), AudioManager.OnAudioFocusChangeListener {
 
                     @Nullable
                     override fun getCurrentContentText(player: Player): String? {
-                        return subTitle
+                        //logger.info("Changing subTitle $notificationSubTitle...")
+                        //return notificationSubTitle
+                        return null
                     }
 
                     @Nullable
@@ -210,15 +223,15 @@ class StreamingCore : Service(), AudioManager.OnAudioFocusChangeListener {
         mediaSessionConnector = MediaSessionConnector(mediaSession)
         mediaSessionConnector?.setPlayer(player)
 
-        playerNotificationManager.setUseStopAction(true)
-        playerNotificationManager.setFastForwardIncrementMs(0)
-        playerNotificationManager.setRewindIncrementMs(0)
-        playerNotificationManager.setUsePlayPauseActions(true)
-        playerNotificationManager.setUseNavigationActions(false)
-        playerNotificationManager.setUseNavigationActionsInCompactView(false)
+        playerNotificationManager?.setUseStopAction(true)
+        playerNotificationManager?.setFastForwardIncrementMs(0)
+        playerNotificationManager?.setRewindIncrementMs(0)
+        playerNotificationManager?.setUsePlayPauseActions(true)
+        playerNotificationManager?.setUseNavigationActions(false)
+        playerNotificationManager?.setUseNavigationActionsInCompactView(false)
 
-        playerNotificationManager.setPlayer(player)
-        playerNotificationManager.setMediaSessionToken(mediaSession.sessionToken)
+        playerNotificationManager?.setPlayer(player)
+        playerNotificationManager?.setMediaSessionToken(mediaSession.sessionToken)
 
         playbackStatus = PlaybackStatus.PLAYING
 

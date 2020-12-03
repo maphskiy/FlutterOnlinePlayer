@@ -103,6 +103,12 @@ class StreamingCore : NSObject, AVPlayerItemMetadataOutputPushDelegate {
         print("Setting volume to: \(formattedVolume)")
         avPlayer?.volume = formattedVolume
     }
+
+     func setTitle(title: String, subTitle:String) -> Void {
+        print("Setting title to: \(title)")
+        let nowPlayingInfo = [MPMediaItemPropertyTitle : title, MPMediaItemPropertyArtist: subTitle]
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+     }
     
     func setUrl(streamURL: String, playWhenReady: String) -> Void {
         let streamURLInstance = URL(string: streamURL)

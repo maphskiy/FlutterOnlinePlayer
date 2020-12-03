@@ -79,6 +79,13 @@ public class FlutterRadioPlayerPlugin : FlutterPlugin, MethodCallHandler {
                 stop()
                 result.success(null)
             }
+            PlayerMethods.SET_TITLE.value -> {
+                logger.info("setTitle service invoked")
+                val title = call.argument<String>("title")!!
+                val subTitle = call.argument<String>("subtitle")!!
+                coreService.setTitle(title,subTitle)
+                result.success(null)
+            }
             PlayerMethods.INIT.value -> {
                 logger.info("start service invoked")
                 init(call)
